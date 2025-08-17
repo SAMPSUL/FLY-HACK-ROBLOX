@@ -16,6 +16,11 @@ local slowSpeed = 1 -- todella hidas, kuten Roblox_igor
 local normalJump = 50
 local slowJump = 10 -- hidas hyppy
 
+-- ===== Spectate settings =====
+local spectating = false
+local targets = {}
+local targetIndex = 1
+
 -- ===== Helper functions =====
 local function getHRP()
     local char = player.Character or player.CharacterAdded:Wait()
@@ -42,6 +47,28 @@ local function updateWalk(char)
         hum.WalkSpeed = normalSpeed
         hum.JumpPower = normalJump
         print("[SlowWalk] POIS (WalkSpeed=" .. normalSpeed .. ", JumpPower=" .. normalJump .. ")")
+    end
+end
+
+-- ===== Spectate helper =====
+local function updateTargets()
+    targets = {}
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            table.insert(targets, p)
+        end
+    end
+    if targetIndex > #targets then
+        targetIndex = 1
+    end
+end
+
+local function nextTarget()
+    updateTargets()
+    if #targets == 0 then return end
+    targetIndex = targetIndex + 1
+    if targetIndex > #targets then
+        targetIndex = 1
     end
 end
 
@@ -79,6 +106,22 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             updateWalk(player.Character)
         end
 
+    -- Spectate toggle (T)
+    elseif input.KeyCode == Enum.KeyCode.T then
+        spectating = not spectating
+        if not spectating then
+            camera.CameraType = Enum.CameraType.Custom
+            print("[Spectate] Pois päältä")
+        else
+            updateTargets()
+            print("[Spectate] Päällä | Seuraa: " .. (targets[targetIndex] and targets[targetIndex].Name or "ei pelaajia"))
+        end
+
+    -- Seuraava pelaaja (E)
+    elseif input.KeyCode == Enum.KeyCode.E and spectating then
+        nextTarget()
+        print("[Spectate] Nyt seuraa: " .. (targets[targetIndex] and targets[targetIndex].Name or "ei pelaajia"))
+
     else
         setKey(input, true)
     end
@@ -91,33 +134,44 @@ end)
 
 -- ===== Fly movement =====
 RunService.RenderStepped:Connect(function(dt)
-    if not flying then return end
-    local hrp, hum = getHRP()
+    -- Fly liike
+    if flying then
+        local hrp, hum = getHRP()
+        local look = camera.CFrame.LookVector
+        local right = camera.CFrame.RightVector
 
-    local look = camera.CFrame.LookVector
-    local right = camera.CFrame.RightVector
+        look = Vector3.new(look.X, 0, look.Z).Unit
+        right = Vector3.new(right.X, 0, right.Z).Unit
 
-    look = Vector3.new(look.X, 0, look.Z).Unit
-    right = Vector3.new(right.X, 0, right.Z).Unit
+        local dir = Vector3.zero
+        if keys.W then dir += look end
+        if keys.S then dir -= look end
+        if keys.A then dir -= right end
+        if keys.D then dir += right end
+        if keys.Up then dir += Vector3.yAxis end
+        if keys.Down then dir -= Vector3.yAxis end
 
-    local dir = Vector3.zero
-    if keys.W then dir += look end
-    if keys.S then dir -= look end
-    if keys.A then dir -= right end
-    if keys.D then dir += right end
-    if keys.Up then dir += Vector3.yAxis end
-    if keys.Down then dir -= Vector3.yAxis end
+        if dir.Magnitude > 0 then
+            dir = dir.Unit
+        end 
 
-    if dir.Magnitude > 0 then
-        dir = dir.Unit
-    end 
+        local hrp, _ = getHRP()
+        hrp.AssemblyLinearVelocity = dir * speed
 
-    hrp.AssemblyLinearVelocity = dir * speed
+        local camCF = camera.CFrame
+        local _, yaw, _ = camCF:ToEulerAnglesYXZ()
+        local pos = hrp.CFrame.Position
+        hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, yaw, 0)
+    end
 
-    local camCF = camera.CFrame
-    local _, yaw, _ = camCF:ToEulerAnglesYXZ()
-    local pos = hrp.CFrame.Position
-    hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, yaw, 0)
+    -- Spectate camera
+    if spectating and targets[targetIndex] and targets[targetIndex].Character then
+        local targetHRP = targets[targetIndex].Character:FindFirstChild("HumanoidRootPart")
+        if targetHRP then
+            camera.CameraType = Enum.CameraType.Scriptable
+            camera.CFrame = CFrame.new(targetHRP.Position + Vector3.new(0,5,10), targetHRP.Position)
+        end
+    end
 end)
 
 -- ===== Character events =====
@@ -129,4 +183,3 @@ end)
 if player.Character then
     updateWalk(player.Character)
 end
-
