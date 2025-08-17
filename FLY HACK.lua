@@ -6,13 +6,15 @@ local camera = workspace.CurrentCamera
 
 -- ===== Fly settings =====
 local flying = false
-local speed = 60 -- studs/sec (säädä +- näppäimillä)
+local speed = 60 -- studs/sec (Fly nopeus)
 local keys = {W=false,A=false,S=false,D=false,Up=false,Down=false}
 
 -- ===== Slow walk settings =====
 local slowWalkEnabled = false
 local normalSpeed = 16
-local slowSpeed =  35
+local slowSpeed = 1 -- todella hidas, kuten Roblox_igor
+local normalJump = 50
+local slowJump = 10 -- hidas hyppy
 
 -- ===== Helper functions =====
 local function getHRP()
@@ -26,7 +28,7 @@ local function setKey(input, down)
     elseif input.KeyCode == Enum.KeyCode.S then keys.S = down
     elseif input.KeyCode == Enum.KeyCode.D then keys.D = down
     elseif input.KeyCode == Enum.KeyCode.Space then keys.Up = down
-    elseif input.KeyCode == Enum.KeyCode.LeftShift then keys.Down = down
+    elseif input.KeyCode == Enum.KeyCode.Q then keys.Down = down
     end
 end
 
@@ -34,10 +36,12 @@ local function updateWalk(char)
     local hum = char:WaitForChild("Humanoid")
     if slowWalkEnabled then
         hum.WalkSpeed = slowSpeed
-        print("[SlowWalk] PÄÄLLÄ (nopeus = " .. slowSpeed .. ")")
+        hum.JumpPower = slowJump
+        print("[SlowWalk] PÄÄLLÄ (WalkSpeed=" .. slowSpeed .. ", JumpPower=" .. slowJump .. ")")
     else
         hum.WalkSpeed = normalSpeed
-        print("[SlowWalk] POIS (nopeus = " .. normalSpeed .. ")")
+        hum.JumpPower = normalJump
+        print("[SlowWalk] POIS (WalkSpeed=" .. normalSpeed .. ", JumpPower=" .. normalJump .. ")")
     end
 end
 
@@ -125,3 +129,4 @@ end)
 if player.Character then
     updateWalk(player.Character)
 end
+
