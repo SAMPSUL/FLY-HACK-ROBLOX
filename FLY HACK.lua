@@ -58,7 +58,7 @@ end)
 
 RunService.RenderStepped:Connect(function(dt)
     if not flying then return end
-    local hrp, hum = getHRP(
+    local hrp, hum = getHRP()
 
     local look = camera.CFrame.LookVector
     local right = camera.CFrame.RightVector
