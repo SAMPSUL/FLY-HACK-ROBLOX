@@ -1,6 +1,3 @@
--- Fly Toggle for Roblox Studio / your own game
--- Place as LocalScript: StarterPlayer > StarterPlayerScripts
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -26,7 +23,6 @@ local function setKey(input, down)
     end
 end
 
--- Toggle fly with F, adjust speed with +/-
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.F then
@@ -60,20 +56,16 @@ UserInputService.InputEnded:Connect(function(input, gpe)
     setKey(input, false)
 end)
 
--- Päivitä liike joka frame
 RunService.RenderStepped:Connect(function(dt)
     if not flying then return end
-    local hrp, hum = getHRP()
+    local hrp, hum = getHRP(
 
-    -- Kameran suuntavektorit
     local look = camera.CFrame.LookVector
     local right = camera.CFrame.RightVector
 
-    -- Poista Y-komponentti sivuttais/eteenliikkeestä (XZ-taso)
     look = Vector3.new(look.X, 0, look.Z).Unit
     right = Vector3.new(right.X, 0, right.Z).Unit
 
-    -- Syöte -> liikesuunta
     local dir = Vector3.zero
     if keys.W then dir += look end
     if keys.S then dir -= look end
@@ -84,9 +76,8 @@ RunService.RenderStepped:Connect(function(dt)
 
     if dir.Magnitude > 0 then
         dir = dir.Unit
-    end
+    end 
 
-    -- Aseta nopeus
     hrp.AssemblyLinearVelocity = dir * speed
     -- Pidä orientaatio siistinä (vain kameran yaw suuntaan)
     local camCF = camera.CFrame
@@ -95,7 +86,6 @@ RunService.RenderStepped:Connect(function(dt)
     hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, yaw, 0)
 end)
 
--- Turva: jos hahmo spawnaa uudelleen, kytke fly pois päältä
 player.CharacterAdded:Connect(function(char)
     flying = false
 end)
