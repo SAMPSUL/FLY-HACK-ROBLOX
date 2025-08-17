@@ -12,7 +12,7 @@ local keys = {W=false,A=false,S=false,D=false,Up=false,Down=false}
 -- ===== Slow walk settings =====
 local slowWalkEnabled = false
 local normalSpeed = 16
-local slowSpeed = 2
+local slowSpeed = -2
 
 -- ===== Helper functions =====
 local function getHRP()
