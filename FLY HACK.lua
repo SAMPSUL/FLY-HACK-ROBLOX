@@ -4,10 +4,17 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
+-- ===== Fly settings =====
 local flying = false
 local speed = 60 -- studs/sec (säädä +- näppäimillä)
 local keys = {W=false,A=false,S=false,D=false,Up=false,Down=false}
 
+-- ===== Slow walk settings =====
+local slowWalkEnabled = false
+local normalSpeed = 16
+local slowSpeed = 2
+
+-- ===== Helper functions =====
 local function getHRP()
     local char = player.Character or player.CharacterAdded:Wait()
     return char:WaitForChild("HumanoidRootPart"), char:WaitForChild("Humanoid")
@@ -23,29 +30,51 @@ local function setKey(input, down)
     end
 end
 
+local function updateWalk(char)
+    local hum = char:WaitForChild("Humanoid")
+    if slowWalkEnabled then
+        hum.WalkSpeed = slowSpeed
+        print("[SlowWalk] PÄÄLLÄ (nopeus = " .. slowSpeed .. ")")
+    else
+        hum.WalkSpeed = normalSpeed
+        print("[SlowWalk] POIS (nopeus = " .. normalSpeed .. ")")
+    end
+end
+
+-- ===== Input events =====
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
+
+    -- Fly toggle
     if input.KeyCode == Enum.KeyCode.F then
         flying = not flying
         local hrp, hum = getHRP()
         if flying then
             hum:ChangeState(Enum.HumanoidStateType.Physics)
             hum.PlatformStand = true
-            -- nollaa putoamisnopeus heti
             hrp.AssemblyLinearVelocity = Vector3.zero
             print("[Fly] ON  | Speed:", speed)
         else
             hum.PlatformStand = false
-            -- palautetaan liike hallinta humanoidille
             hrp.AssemblyLinearVelocity = Vector3.zero
             print("[Fly] OFF")
         end
+
+    -- Fly speed adjustment
     elseif input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.KeypadPlus then
         speed = math.clamp(speed + 10, 10, 300)
         if flying then print("[Fly] Speed:", speed) end
     elseif input.KeyCode == Enum.KeyCode.Minus or input.KeyCode == Enum.KeyCode.KeypadMinus then
         speed = math.clamp(speed - 10, 10, 300)
         if flying then print("[Fly] Speed:", speed) end
+
+    -- Slow walk toggle (H)
+    elseif input.KeyCode == Enum.KeyCode.H then
+        slowWalkEnabled = not slowWalkEnabled
+        if player.Character then
+            updateWalk(player.Character)
+        end
+
     else
         setKey(input, true)
     end
@@ -56,6 +85,7 @@ UserInputService.InputEnded:Connect(function(input, gpe)
     setKey(input, false)
 end)
 
+-- ===== Fly movement =====
 RunService.RenderStepped:Connect(function(dt)
     if not flying then return end
     local hrp, hum = getHRP()
@@ -79,13 +109,19 @@ RunService.RenderStepped:Connect(function(dt)
     end 
 
     hrp.AssemblyLinearVelocity = dir * speed
-    -- Pidä orientaatio siistinä (vain kameran yaw suuntaan)
+
     local camCF = camera.CFrame
     local _, yaw, _ = camCF:ToEulerAnglesYXZ()
     local pos = hrp.CFrame.Position
     hrp.CFrame = CFrame.new(pos) * CFrame.Angles(0, yaw, 0)
 end)
 
+-- ===== Character events =====
 player.CharacterAdded:Connect(function(char)
     flying = false
+    updateWalk(char)
 end)
+
+if player.Character then
+    updateWalk(player.Character)
+end
