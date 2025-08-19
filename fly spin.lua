@@ -6,18 +6,17 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
 local flying = false
-local speed = 100
-local rotationSpeed = 10
+local speed = 100           -- liikkumisnopeus
+local rotationSpeed = 10    -- pyöriminen ilmassa
 
 local keysDown = {}
 local bodyVelocity
 
--- lennon päälle/pois
+-- Kytkee lennon päälle/pois
 local function toggleFly()
 	flying = not flying
 	if flying then
 		print("Lento päälle")
-		-- luodaan BodyVelocity joka pitää hahmon ilmassa
 		bodyVelocity = Instance.new("BodyVelocity")
 		bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
 		bodyVelocity.Velocity = Vector3.new(0,0,0)
@@ -31,7 +30,7 @@ local function toggleFly()
 	end
 end
 
--- näppäinten painallukset
+-- Näppäinten painallukset
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if not gameProcessed then
 		if input.KeyCode == Enum.KeyCode.F then
@@ -46,7 +45,7 @@ UserInputService.InputEnded:Connect(function(input)
 	keysDown[input.KeyCode] = false
 end)
 
--- ohjaus + pyöriminen
+-- Liike ja pyöriminen
 RunService.RenderStepped:Connect(function(deltaTime)
 	if flying and humanoidRootPart and bodyVelocity then
 		local camera = workspace.CurrentCamera
@@ -79,8 +78,9 @@ RunService.RenderStepped:Connect(function(deltaTime)
 
 		bodyVelocity.Velocity = direction
 
-		-- kevyt pyöriminen
+		-- Pyöriminen ilmassa nopeudella 10
 		humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.Angles(0, math.rad(rotationSpeed), 0)
 	end
 end)
+
 
