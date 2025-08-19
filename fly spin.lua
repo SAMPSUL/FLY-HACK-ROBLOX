@@ -1,4 +1,3 @@
-
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
@@ -7,10 +6,14 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
 local flying = false
-local speed = 150   
-local rotationSpeed = 15 
+local speed = 100          
+local rotationSpeed = 3   
 
-local function fly()
+local moveDirection = Vector3.new()
+
+local keysDown = {}
+
+local function toggleFly()
 	flying = not flying
 	if flying then
 		print("Lento päälle")
@@ -20,19 +23,49 @@ local function fly()
 end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.F then
-		fly()
+	if not gameProcessed then
+		if input.KeyCode == Enum.KeyCode.F then
+			toggleFly()
+		else
+			keysDown[input.KeyCode] = true
+		end
 	end
 end)
 
-RunService.RenderStepped:Connect(function(deltaTime)
-	if flying and character and humanoidRootPart then
-      
-		local camera = workspace.CurrentCamera
-		local moveDirection = camera.CFrame.LookVector * speed * deltaTime
-		humanoidRootPart.CFrame = humanoidRootPart.CFrame + moveDirection
+UserInputService.InputEnded:Connect(function(input)
+	keysDown[input.KeyCode] = false
+end)
 
+RunService.RenderStepped:Connect(function(deltaTime)
+	if flying and humanoidRootPart then
+		local camera = workspace.CurrentCamera
+		local direction = Vector3.new()
+
+		if keysDown[Enum.KeyCode.W] then
+			direction = direction + camera.CFrame.LookVector
+		end
+		if keysDown[Enum.KeyCode.S] then
+			direction = direction - camera.CFrame.LookVector
+		end
+		if keysDown[Enum.KeyCode.A] then
+			direction = direction - camera.CFrame.RightVector
+		end
+		if keysDown[Enum.KeyCode.D] then
+			direction = direction + camera.CFrame.RightVector
+		end
 		
+		if keysDown[Enum.KeyCode.Space] then
+			direction = direction + Vector3.new(0,1,0)
+		end
+		if keysDown[Enum.KeyCode.Q] then
+			direction = direction + Vector3.new(0,-1,0)
+		end
+
+		if direction.Magnitude > 0 then
+			direction = direction.Unit * speed * deltaTime
+			humanoidRootPart.CFrame = humanoidRootPart.CFrame + direction
+			end
+			
 		humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.Angles(0, math.rad(rotationSpeed), 0)
 	end
 end)
