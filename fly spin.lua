@@ -7,7 +7,7 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
 local flying = false
 local speed = 100
-local rotationSpeed = 5
+local rotationSpeed = 10
 
 local keysDown = {}
 local bodyVelocity
