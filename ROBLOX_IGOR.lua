@@ -7,7 +7,7 @@ local runService = game:GetService("RunService")
 local camera = workspace.CurrentCamera
 
 local egorSpeed = 2
-local egorJump = 150
+local egorJump = 10
 
 humanoid.WalkSpeed = egorSpeed
 humanoid.JumpPower = egorJump
