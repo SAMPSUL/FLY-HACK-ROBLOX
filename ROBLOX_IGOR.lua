@@ -1,4 +1,3 @@
-
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
@@ -7,21 +6,19 @@ local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local camera = workspace.CurrentCamera
 
-local egorOn = true
-local normalSpeed = 16
-local normalJump = 50
-local egorSpeed = 1
-local egorJump = 150
+local egorSpeed = 2      -- Pelaajan oikea liikkumisnopeus
+local egorJump = 150     -- Hyppykorkeus
 
 humanoid.WalkSpeed = egorSpeed
 humanoid.JumpPower = egorJump
 
 local animator = humanoid:WaitForChild("Animator")
+
 local walkAnim = Instance.new("Animation")
 walkAnim.AnimationId = "rbxassetid://180426354" 
 local walkTrack = animator:LoadAnimation(walkAnim)
 walkTrack:Play()
-walkTrack:AdjustSpeed(6)
+walkTrack:AdjustSpeed(8) -- erittäin nopea kävely-animaatio
 
 local jumpAnim = Instance.new("Animation")
 jumpAnim.AnimationId = "rbxassetid://125750702" 
@@ -59,3 +56,4 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
         jumpTrack:AdjustSpeed(2.5)
     end
 end)
+
