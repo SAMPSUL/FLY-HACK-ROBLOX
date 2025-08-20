@@ -15,13 +15,11 @@ humanoid.JumpPower = egorJump
 local animator = humanoid:WaitForChild("Animator")
 
 local walkAnim = Instance.new("Animation")
-walkAnim.AnimationId = "rbxassetid://180426354" 
+walkAnim.AnimationId = "rbxassetid://180426354"
 local walkTrack = animator:LoadAnimation(walkAnim)
-walkTrack:Play()
-walkTrack:AdjustSpeed(8)
 
 local jumpAnim = Instance.new("Animation")
-jumpAnim.AnimationId = "rbxassetid://125750702" 
+jumpAnim.AnimationId = "rbxassetid://125750702"
 local jumpTrack = animator:LoadAnimation(jumpAnim)
 
 local moveDirection = Vector3.new()
@@ -45,6 +43,14 @@ runService.RenderStepped:Connect(function()
     if moveDirection.Magnitude > 0 then
         local moveUnit = moveDirection.Unit
         humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + moveUnit)
+        if not walkTrack.IsPlaying then
+            walkTrack:Play()
+            walkTrack:AdjustSpeed(8)
+        end
+    else
+        if walkTrack.IsPlaying then
+            walkTrack:Stop()
+        end
     end
 
     humanoid:Move(moveDirection * humanoid.WalkSpeed)
@@ -58,5 +64,3 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
         jumpTrack:AdjustSpeed(2.5)
     end
 end)
-
-
