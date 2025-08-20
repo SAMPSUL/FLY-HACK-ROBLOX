@@ -1,10 +1,17 @@
 
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
-humanoid.BodyHeightScale.Value = 5    
-humanoid.BodyWidthScale.Value = 5     
-humanoid.BodyDepthScale.Value = 5     
-humanoid.HeadScale.Value = 3          
+local function makeBig()
+   
+    local scale = 5 
+    
+    humanoid.BodyHeightScale.Value = scale
+    humanoid.BodyWidthScale.Value = scale
+    humanoid.BodyDepthScale.Value = scale
+    humanoid.HeadScale.Value = scale
+end
 
+makeBig()
