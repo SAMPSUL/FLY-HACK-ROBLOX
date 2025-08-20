@@ -1,52 +1,66 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local userInput = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
 
+local egorSpeed = 2
+local egorJump = 10
 
-local Players = game:GetService("Players")
+humanoid.WalkSpeed = egorSpeed
+humanoid.JumpPower = egorJump
 
+local animator = humanoid:WaitForChild("Animator")
 
-local targetPlayerName = "HAMPURILAINEN14"
+local walkAnim = Instance.new("Animation")
+walkAnim.AnimationId = "rbxassetid://180426354"
+local walkTrack = animator:LoadAnimation(walkAnim)
 
-local function makeEgor(player)
-    if player.Name ~= targetPlayerName then return end -- vain sinä
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:WaitForChild("Humanoid")
-    local animator = humanoid:WaitForChild("Animator")
+local jumpAnim = Instance.new("Animation")
+jumpAnim.AnimationId = "rbxassetid://125750702"
+local jumpTrack = animator:LoadAnimation(jumpAnim)
 
-    
-    humanoid.WalkSpeed = 50
-    humanoid.JumpPower = 100
+local moveDirection = Vector3.new()
 
+runService.RenderStepped:Connect(function()
+    local direction = Vector3.new(0,0,0)
+    if userInput:IsKeyDown(Enum.KeyCode.W) then
+        direction = direction + camera.CFrame.LookVector
+    end
+    if userInput:IsKeyDown(Enum.KeyCode.S) then
+        direction = direction - camera.CFrame.LookVector
+    end
+    if userInput:IsKeyDown(Enum.KeyCode.A) then
+        direction = direction - camera.CFrame.RightVector
+    end
+    if userInput:IsKeyDown(Enum.KeyCode.D) then
+        direction = direction + camera.CFrame.RightVector
+    end
 
-    local walkAnim = Instance.new("Animation")
-    walkAnim.AnimationId = "rbxassetid://180426354" 
-    local walkTrack = animator:LoadAnimation(walkAnim)
-    walkTrack.Priority = Enum.AnimationPriority.Movement
-    walkTrack:Play()
-    walkTrack:AdjustSpeed(2) 
-
-    local jumpAnim = Instance.new("Animation")
-    jumpAnim.AnimationId = "rbxassetid://125750702" 
-    local jumpTrack = animator:LoadAnimation(jumpAnim)
-    jumpTrack.Priority = Enum.AnimationPriority.Action
-
-    
-    humanoid.Jumping:Connect(function(active)
-        if active then
-            jumpTrack:Play()
-            jumpTrack:AdjustSpeed(2)
+    moveDirection = Vector3.new(direction.X,0,direction.Z)
+    if moveDirection.Magnitude > 0 then
+        local moveUnit = moveDirection.Unit
+        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + moveUnit)
+        if not walkTrack.IsPlaying then
+            walkTrack:Play()
+            walkTrack:AdjustSpeed(8)
         end
-    end)
-end
+    else
+        if walkTrack.IsPlaying then
+            walkTrack:Stop()
+        end
+    end
 
-
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        makeEgor(player)
-    end)
+    humanoid:Move(moveDirection * humanoid.WalkSpeed)
 end)
 
-
-for _, player in pairs(Players:GetPlayers()) do
-    if player.Character then
-        makeEgor(player)
+userInput.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        humanoid.Jump = true
+        jumpTrack:Play()
+        jumpTrack:AdjustSpeed(2.5)
     end
-end
+end)
