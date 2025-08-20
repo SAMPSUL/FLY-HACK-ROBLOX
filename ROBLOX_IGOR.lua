@@ -6,8 +6,8 @@ local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local camera = workspace.CurrentCamera
 
-local egorSpeed = 2      -- Pelaajan oikea liikkumisnopeus
-local egorJump = 150     -- Hyppykorkeus
+local egorSpeed = 2
+local egorJump = 150
 
 humanoid.WalkSpeed = egorSpeed
 humanoid.JumpPower = egorJump
@@ -18,11 +18,13 @@ local walkAnim = Instance.new("Animation")
 walkAnim.AnimationId = "rbxassetid://180426354" 
 local walkTrack = animator:LoadAnimation(walkAnim)
 walkTrack:Play()
-walkTrack:AdjustSpeed(8) -- erittäin nopea kävely-animaatio
+walkTrack:AdjustSpeed(8)
 
 local jumpAnim = Instance.new("Animation")
 jumpAnim.AnimationId = "rbxassetid://125750702" 
 local jumpTrack = animator:LoadAnimation(jumpAnim)
+
+local moveDirection = Vector3.new()
 
 runService.RenderStepped:Connect(function()
     local direction = Vector3.new(0,0,0)
@@ -39,13 +41,13 @@ runService.RenderStepped:Connect(function()
         direction = direction + camera.CFrame.RightVector
     end
 
-    local moveDir = Vector3.new(direction.X,0,direction.Z)
-    if moveDir.Magnitude > 0 then
-        moveDir = moveDir.Unit
-        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + moveDir)
+    moveDirection = Vector3.new(direction.X,0,direction.Z)
+    if moveDirection.Magnitude > 0 then
+        local moveUnit = moveDirection.Unit
+        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + moveUnit)
     end
 
-    humanoid:Move(moveDir * humanoid.WalkSpeed)
+    humanoid:Move(moveDirection * humanoid.WalkSpeed)
 end)
 
 userInput.InputBegan:Connect(function(input, gameProcessed)
@@ -56,4 +58,5 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
         jumpTrack:AdjustSpeed(2.5)
     end
 end)
+
 
