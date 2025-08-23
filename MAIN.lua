@@ -35,7 +35,7 @@ title.Parent = frame
 local buttonsInfo = {
     {name="ROBLOX_IGOR", url="https://raw.githubusercontent.com/SAMPSUL/SAMPSULS-MOD-MENU-ROBLOX/refs/heads/main/HACKS/ROBLOX_IGOR%20(NOT%20WORKING%20GOOD).LUA"},
     {name="FLY", url="https://raw.githubusercontent.com/SAMPSUL/SAMPSULS-MOD-MENU-ROBLOX/refs/heads/main/HACKS/FLY.lua"},
-    {name="FLY + SPIN", url="https://raw.githubusercontent.com/SAMPSUL/SAMPSULS-MOD-MENU-ROBLOX/refs/heads/main/FLY%20SPIN.lua"},
+    {name="FLY + SPIN", url="https://raw.githubusercontent.com/SAMPSUL/SAMPSULS-MOD-MENU-ROBLOX/refs/heads/main/HACKS/FLY%20SPIN.lua"},
     {name="NO CLIP", url="https://raw.githubusercontent.com/SAMPSUL/FLY-HACK-ROBLOX/refs/heads/main/NOCLIP.lua"},
     {name="MAX HP", url="https://raw.githubusercontent.com/SAMPSUL/FLY-HACK-ROBLOX/refs/heads/main/MAXHP.lua"},
     {name="NOT WORKING", url="https://raw.githubusercontent.com/USERNAME/REPO/main/script6.lua"},
