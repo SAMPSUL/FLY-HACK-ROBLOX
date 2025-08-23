@@ -1,5 +1,4 @@
-YOU CAN USE THIS OR PUT THE WHOLE CODE
-
+              SAMPSUL MOD MENU 
 🚨NOTE!! You need to have some executor for this to work🚨
 
 MOD MENU CODE:
